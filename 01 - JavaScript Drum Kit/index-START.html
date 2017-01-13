@@ -57,8 +57,43 @@
   <audio data-key="75" src="sounds/tom.wav"></audio>
   <audio data-key="76" src="sounds/tink.wav"></audio>
 
-<script>
-
+<script>  
+  function playSoundFromKeyboard(event) {
+    const keycode = event.keyCode;
+    const audio = document.querySelector(`audio[data-key="${keycode}"]`);
+    const key = document.querySelector(`.key[data-key="${keycode}"]`);
+    playKey(audio, key);
+  }
+  
+  function playSoundFromClick(key) {
+    const keycode = key.getAttribute('data-key');
+    const audio = document.querySelector(`audio[data-key="${keycode}"]`);
+    playKey(audio, key);    
+  }
+  
+  function playKey(audio, key) {
+    if (!audio) return;
+    
+    key.className = ' key playing';
+    audio.currentTime = 0; //  reset time on audio
+    audio.play();    
+  }
+  
+  function removeTransition(e) {
+    if (e.propertyName !== 'transform') return;
+    console.log('remove class');
+    this.className = 'key';
+  }
+  
+  const keys = document.querySelectorAll('.key');
+  
+  document.addEventListener('keydown', playSoundFromKeyboard);
+  
+  keys.forEach(key => { 
+    key.addEventListener('transitionend', removeTransition);
+    key.addEventListener('click', () => playSoundFromClick(key) );
+  });
+  
 </script>
 
 
