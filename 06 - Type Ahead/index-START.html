@@ -16,6 +16,57 @@
   </form>
 <script>
 const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+const cities = [];
+
+// fetch the data
+fetch(endpoint)
+  .then((blob) => blob.json())
+  .then((data) => {
+    cities.push(...data);
+  });
+
+function findMatches(searchTerm, cities) {
+
+  // need a regex to find a match based on passed wordToMatch
+
+  const regex = new RegExp(searchTerm, 'gi');
+
+  // filter cities based on provided regex that matches passed wordToMatch
+  const matchedCities = cities.filter((place) => {
+    return place.city.match(regex) || place.state.match(regex);
+  });
+
+  return matchedCities;
+
+}
+
+function formatWithCommas(a) {
+  return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+
+// render values to HTML
+function renderMatchesToHTML() {
+  const searchTerm = this.value;
+  // create a regex value based on value passed
+  const regex = new RegExp(searchTerm, 'gi');
+  const html = findMatches(searchTerm, cities).map((place) => {
+    // highlight search term in results
+    const city = place.city.replace(regex, `<span class="hl">${searchTerm}</span>`);
+    const state = place.state.replace(regex, `<span class="hl">${searchTerm}</span>`);
+    return `<li>
+      <span class="place">${city}, ${state}</span>
+      <span class="population">${formatWithCommas(place.population)}</span>
+    </li>`;
+  }).join(''); // make sure to create a string otherwise array will return
+  suggestions.innerHTML = html;
+}
+
+// grab UI components
+const search = document.querySelector('.search');
+const suggestions = document.querySelector('.suggestions');
+
+search.addEventListener('keyup', renderMatchesToHTML);
 
 </script>
   </body>
